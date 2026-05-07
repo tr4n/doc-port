@@ -4,7 +4,7 @@
   "short_name": "DocPort",
   "version": "1.0.0",
   "author": "quanghuytran.hust@gmail.com",
-  "description": "Export any Google Docs page — including view-only — to a properly formatted .docx file. Preserves headings, bold, italic, tables, lists, images, and hyperlinks.",
+  "description": "Export Google Docs (including view-only) to .docx files. Preserves headings, styling, tables, images, and links.",
   "permissions": [
     "activeTab",
     "scripting"
