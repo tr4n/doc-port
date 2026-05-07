@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>DocPort</title>
@@ -215,7 +215,7 @@
     .footer {
       padding: 8px 16px;
       border-top: 1px solid #f1f3f4;
-      display: flex; justify-content: center;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
     }
     .footer span { font-size: 10.5px; color: #9aa0a6; }
   </style>
@@ -244,22 +244,22 @@
     <div class="steps">
       <div class="step" id="step1">
         <div class="step-bubble">1</div>
-        <div class="step-label">Đọc URL</div>
+        <div class="step-label">Read URL</div>
       </div>
       <div class="step-connector" id="conn1"></div>
       <div class="step" id="step2">
         <div class="step-bubble">2</div>
-        <div class="step-label">Tải nội dung</div>
+        <div class="step-label">Fetch Content</div>
       </div>
       <div class="step-connector" id="conn2"></div>
       <div class="step" id="step3">
         <div class="step-bubble">3</div>
-        <div class="step-label">Xử lý</div>
+        <div class="step-label">Process</div>
       </div>
       <div class="step-connector" id="conn3"></div>
       <div class="step" id="step4">
         <div class="step-bubble">4</div>
-        <div class="step-label">Hoàn thành</div>
+        <div class="step-label">Done</div>
       </div>
     </div>
 
@@ -284,7 +284,7 @@
           <path d="M12 15l-4-4h3V4h2v7h3l-4 4z" fill="white"/>
           <path d="M5 18h14v2H5v-2z" fill="white"/>
         </svg>
-        Xuất .docx
+        Export .docx
       </button>
     </div>
 
@@ -306,7 +306,7 @@
           <div class="preview-doc-title" id="previewTitle"></div>
           <div class="preview-stats" id="previewStats"></div>
         </div>
-        <button class="btn-close-preview" id="closePreviewBtn" title="Đóng preview">×</button>
+        <button class="btn-close-preview" id="closePreviewBtn" title="Close preview">×</button>
       </div>
       <div id="previewContent"></div>
     </div>
@@ -316,6 +316,7 @@
   <!-- Footer -->
   <div class="footer">
     <span>DocPort · Google Docs view-only &amp; edit · images · tables · headings</span>
+    <span>&copy; 2026 quanghuytran.hust@gmail.com</span>
   </div>
 
   <script src="popup.js"></script>

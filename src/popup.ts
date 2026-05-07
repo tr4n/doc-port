@@ -93,12 +93,12 @@ function showPreviewSection(parsed: ParsedDocument): void {
   parsed.elements.forEach((el) => { counts[el.type] = (counts[el.type] ?? 0) + 1; });
 
   const statParts: string[] = [];
-  if (counts.heading)   statParts.push(`${counts.heading} tiêu đề`);
-  if (counts.paragraph) statParts.push(`${counts.paragraph} đoạn văn`);
-  if (counts.listItem)  statParts.push(`${counts.listItem} mục list`);
-  if (counts.table)     statParts.push(`${counts.table} bảng`);
-  if (counts.image)     statParts.push(`${counts.image} hình ảnh`);
-  statsEl.textContent = statParts.join(' · ') || 'Không có nội dung';
+  if (counts.heading)   statParts.push(`${counts.heading} heading(s)`);
+  if (counts.paragraph) statParts.push(`${counts.paragraph} paragraph(s)`);
+  if (counts.listItem)  statParts.push(`${counts.listItem} list item(s)`);
+  if (counts.table)     statParts.push(`${counts.table} table(s)`);
+  if (counts.image)     statParts.push(`${counts.image} image(s)`);
+  statsEl.textContent = statParts.join(' · ') || 'No content found';
 
   contentEl.innerHTML = generatePreviewHtml(parsed);
   section.style.display = 'block';
@@ -203,7 +203,7 @@ function generatePreviewHtml(parsed: ParsedDocument): string {
     }
   }
 
-  return parts.join('') || '<p class="pv-empty">Không tìm thấy nội dung.</p>';
+  return parts.join('') || '<p class="pv-empty">No content found.</p>';
 }
 
 // ──────────────────────────────────────────────
@@ -226,7 +226,7 @@ function toMobileBasicUrl(docId: string): string {
  */
 async function getActiveTab(): Promise<{ id: number; url: string }> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id) throw new Error('Không tìm thấy tab hiện tại.');
+  if (!tab?.id) throw new Error('Active tab not found.');
 
   const results = await chrome.scripting.executeScript({
     target: { tabId: tab.id },
@@ -234,7 +234,7 @@ async function getActiveTab(): Promise<{ id: number; url: string }> {
   });
 
   const url = results[0]?.result as unknown as string;
-  if (!url) throw new Error('Không thể đọc URL của tab.');
+  if (!url) throw new Error('Could not read tab URL.');
 
   return { id: tab.id, url };
 }
@@ -247,7 +247,7 @@ async function getActiveTab(): Promise<{ id: number; url: string }> {
 /** Fetches the mobilebasic HTML from the tab context */
 function fetchMobileBasicHtml(mobileUrl: string): string {
   return fetch(mobileUrl, { credentials: 'include' }).then((r: Response) => {
-    if (!r.ok) throw new Error(`HTTP ${r.status} – không thể tải tài liệu`);
+    if (!r.ok) throw new Error(`HTTP ${r.status} – could not load document`);
     return r.text();
   }) as unknown as string;
 }
@@ -282,7 +282,7 @@ function fetchImagesAsBase64(urls: string[]): Record<string, string> {
 
 async function fetchAndParse(tabId: number, tabUrl: string): Promise<ParsedDocument> {
   const docId = extractDocId(tabUrl);
-  if (!docId) throw new Error('Không thể đọc Document ID từ URL.');
+  if (!docId) throw new Error('Could not extract Document ID from URL.');
 
   const mobileUrl = toMobileBasicUrl(docId);
 
