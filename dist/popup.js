@@ -20787,9 +20787,7 @@ async function handlePreview() {
         setStep(4);
         showPreviewSection(parsed);
         setExportButtonEnabled(true);
-        const imgCount = parsed.elements.filter((e) => e.type === 'image').length;
-        const imgNote = imgCount ? ` · ${imgCount} image(s)` : '';
-        setStatus(`Preview ready — ${parsed.elements.length} elements${imgNote}. Click "Export .docx" to download.`, 'success');
+        setStatus(`Preview ready. Click "Export .docx" to download.`, 'success');
     }
     catch (err) {
         setStatus(`Error: ${err.message}`, 'error');
