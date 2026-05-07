@@ -20643,21 +20643,13 @@ function toMobileBasicUrl(docId) {
 }
 /**
  * Gets the active tab's ID and URL.
- * Uses scripting.executeScript to read window.location.href — avoids
- * the 'tabs' permission (which shows "read browsing history" warning).
+ * Uses the activeTab permission to safely read the URL.
  */
 async function getActiveTab() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id)
         throw new Error('Active tab not found.');
-    const results = await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: () => window.location.href,
-    });
-    const url = results[0]?.result;
-    if (!url)
-        throw new Error('Could not read tab URL.');
-    return { id: tab.id, url };
+    return { id: tab.id, url: tab.url || '' };
 }
 // ──────────────────────────────────────────────
 // Tab-injected functions
