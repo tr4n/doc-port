@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>DocPort</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, "Google Sans", "Segoe UI", Roboto, sans-serif;
+      background: #fff;
+      color: #202124;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+      padding: 16px 18px 14px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+    .header-icon {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .header-text h1 { font-size: 15px; font-weight: 600; }
+    .header-text p  { font-size: 10.5px; opacity: 0.8; margin-top: 1px; }
+
+    /* ── Body ── */
+    .body { padding: 14px 16px; }
+
+    /* ── Steps ── */
+    .steps { display: flex; align-items: center; margin-bottom: 14px; }
+    .step  { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+
+    .step-bubble {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 2px solid #dadce0; background: #f8f9fa;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 600; color: #9aa0a6;
+      transition: all .2s;
+    }
+    .step-label  { font-size: 9px; color: #9aa0a6; text-align: center; white-space: nowrap; transition: color .2s; }
+    .step-connector { height: 2px; flex: 1; background: #dadce0; margin-bottom: 16px; transition: background .2s; }
+
+    .step.active .step-bubble { border-color: #1a73e8; background: #e8f0fe; color: #1a73e8; }
+    .step.active .step-label  { color: #1a73e8; }
+    .step.done   .step-bubble { border-color: #34a853; background: #34a853; color: white; }
+    .step.done   .step-label  { color: #34a853; }
+    .step-connector.done { background: #34a853; }
+
+    /* ── Status box ── */
+    .status-box {
+      min-height: 38px; border-radius: 8px; padding: 8px 11px;
+      font-size: 12px; line-height: 1.5;
+      display: flex; align-items: flex-start; gap: 7px;
+      margin-bottom: 12px;
+      background: #f8f9fa; color: #5f6368;
+      transition: all .2s;
+    }
+    .status-box.loading { background: #e8f0fe; color: #1a73e8; }
+    .status-box.success { background: #e6f4ea; color: #137333; }
+    .status-box.error   { background: #fce8e6; color: #c5221f; }
+
+    .status-icon { font-size: 15px; flex-shrink: 0; line-height: 1.5; }
+
+    .spinner {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(26,115,232,.3);
+      border-top-color: #1a73e8;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 8px; margin-bottom: 8px; }
+
+    .btn {
+      flex: 1; padding: 9px 12px; border: none; border-radius: 8px;
+      font-size: 12.5px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all .18s;
+    }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .btn-primary   { background: #1a73e8; color: white; }
+    .btn-primary:hover:not(:disabled)   { background: #1557b0; }
+
+    .btn-success   { background: #34a853; color: white; }
+    .btn-success:hover:not(:disabled)   { background: #2b8c46; }
+
+    .btn-ghost {
+      width: 100%; flex: unset;
+      background: #f1f3f4; color: #3c4043;
+      font-size: 11.5px; padding: 7px 12px;
+    }
+    .btn-ghost:hover:not(:disabled) { background: #e8eaed; }
+
+    /* ── Preview section ── */
+    #previewSection {
+      display: none;
+      border: 1px solid #dadce0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .preview-header {
+      background: #f8f9fa;
+      border-bottom: 1px solid #dadce0;
+      padding: 9px 12px;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+    }
+    .preview-header-left { min-width: 0; }
+    .preview-doc-title {
+      font-size: 12px; font-weight: 600; color: #202124;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 270px;
+    }
+    .preview-stats { font-size: 10.5px; color: #5f6368; margin-top: 2px; }
+
+    .btn-close-preview {
+      background: none; border: none; cursor: pointer;
+      color: #9aa0a6; font-size: 18px; line-height: 1;
+      padding: 0 2px; flex-shrink: 0;
+      transition: color .15s;
+    }
+    .btn-close-preview:hover { color: #202124; }
+
+    /* Scrollable content area */
+    #previewContent {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 12px 14px;
+      background: white;
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: #202124;
+    }
+    #previewContent::-webkit-scrollbar { width: 5px; }
+    #previewContent::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 3px; }
+
+    /* ── Preview content styles ── */
+    #previewContent h1 { font-size: 16px; font-weight: 700; margin: 10px 0 6px; color: #202124; }
+    #previewContent h2 { font-size: 14px; font-weight: 700; margin: 8px 0 5px; }
+    #previewContent h3 { font-size: 12.5px; font-weight: 700; margin: 6px 0 4px; }
+    #previewContent h4,
+    #previewContent h5,
+    #previewContent h6 { font-size: 11.5px; font-weight: 700; margin: 5px 0 4px; }
+    #previewContent p  { margin: 3px 0 5px; }
+
+    #previewContent a  { color: #1155cc; }
+
+    /* List items */
+    .pv-li {
+      position: relative;
+      margin: 2px 0;
+    }
+    .pv-bullet {
+      display: inline-block;
+      width: 14px;
+      margin-left: -14px;
+      color: #5f6368;
+    }
+
+    /* Tables */
+    .pv-table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 6px 0;
+      font-size: 11px;
+    }
+    .pv-table td,
+    .pv-table th {
+      border: 1px solid #dadce0;
+      padding: 4px 7px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .pv-table th {
+      background: #f1f3f4;
+      font-weight: 600;
+    }
+
+    /* Images */
+    .pv-img {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 9px;
+      background: #f8f9fa;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      margin: 5px 0;
+      min-height: 36px;
+    }
+    .pv-img-thumb {
+      max-width: 80px; max-height: 60px;
+      border-radius: 4px; object-fit: cover;
+      border: 1px solid #dadce0;
+      flex-shrink: 0;
+    }
+    .pv-img-icon { font-size: 18px; flex-shrink: 0; }
+    .pv-img-label { font-size: 10.5px; color: #5f6368; word-break: break-all; }
+    .pv-img-dims  { color: #9aa0a6; margin-left: 4px; }
+
+    .pv-empty { color: #9aa0a6; font-style: italic; text-align: center; padding: 16px; }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 8px 16px;
+      border-top: 1px solid #f1f3f4;
+      display: flex; justify-content: center;
+    }
+    .footer span { font-size: 10.5px; color: #9aa0a6; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+              stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M14 2v6h6" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M9 13h6M9 17h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>DocPort</h1>
+      <p>Google Docs view-only → .docx · images · tables</p>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Progress Steps -->
+    <div class="steps">
+      <div class="step" id="step1">
+        <div class="step-bubble">1</div>
+        <div class="step-label">Đọc URL</div>
+      </div>
+      <div class="step-connector" id="conn1"></div>
+      <div class="step" id="step2">
+        <div class="step-bubble">2</div>
+        <div class="step-label">Tải nội dung</div>
+      </div>
+      <div class="step-connector" id="conn2"></div>
+      <div class="step" id="step3">
+        <div class="step-bubble">3</div>
+        <div class="step-label">Xử lý</div>
+      </div>
+      <div class="step-connector" id="conn3"></div>
+      <div class="step" id="step4">
+        <div class="step-bubble">4</div>
+        <div class="step-label">Hoàn thành</div>
+      </div>
+    </div>
+
+    <!-- Status Box -->
+    <div id="statusBox" class="status-box">
+      <span class="status-icon">📄</span>
+      <span id="statusText">Click "Preview" to inspect the document before exporting.</span>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-row">
+      <button class="btn btn-primary" id="previewBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="3" stroke="white" stroke-width="1.6"/>
+        </svg>
+        Preview
+      </button>
+      <button class="btn btn-success" id="exportBtn" disabled>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M12 15l-4-4h3V4h2v7h3l-4 4z" fill="white"/>
+          <path d="M5 18h14v2H5v-2z" fill="white"/>
+        </svg>
+        Xuất .docx
+      </button>
+    </div>
+
+    <button class="btn btn-ghost" id="openMobileBtn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+              stroke="#3c4043" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M15 3h6v6" stroke="#3c4043" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10 14L21 3" stroke="#3c4043" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Open mobilebasic view in new tab
+    </button>
+
+    <!-- Preview Section (hidden until loaded) -->
+    <div id="previewSection" style="margin-top:12px">
+      <div class="preview-header">
+        <div class="preview-header-left">
+          <div class="preview-doc-title" id="previewTitle"></div>
+          <div class="preview-stats" id="previewStats"></div>
+        </div>
+        <button class="btn-close-preview" id="closePreviewBtn" title="Đóng preview">×</button>
+      </div>
+      <div id="previewContent"></div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>DocPort · Google Docs view-only &amp; edit · images · tables · headings</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

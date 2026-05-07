@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+# dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment & secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional: test / coverage
+coverage/
+.nyc_output/
+
+# Optional: temp / local notes you don’t want tracked
+*.local
+.cache/

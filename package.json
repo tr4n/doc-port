@@ -1,0 +1,27 @@
+{
+  "name": "docs-scanner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chrome Extension to extract view-only Google Docs to .docx",
+  "author": "Quang Huy Tran <quanghuytran.hust@gmail.com>",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "icons": "node scripts/generate-icons.js",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/file-saver": "^2.0.7",
+    "copy-webpack-plugin": "^12.0.2",
+    "sharp": "^0.34.5",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "docx": "^8.5.0",
+    "file-saver": "^2.0.5"
+  }
+}
