@@ -370,7 +370,7 @@ export async function buildDocx(parsed: ParsedDocument): Promise<Blob> {
     styles: {
       default: {
         document: {
-          run: { font: 'Calibri', size: 22 },
+          run: { font: 'Arial', size: 22 },
         },
       },
     },
