@@ -364,7 +364,7 @@ async function handlePreview(): Promise<void> {
 
     const { id: tabId, url: tabUrl } = await getActiveTab();
 
-    if (!tabUrl.includes('docs.google.com/document/')) {
+    if (!tabUrl.startsWith('https://docs.google.com/document/')) {
       setStatus('Not a Google Docs page. Please open a document first.', 'error');
       return;
     }
@@ -411,7 +411,7 @@ async function handleExport(): Promise<void> {
       setStatus('Fetching document…', 'loading');
 
       const { id: tabId, url: tabUrl } = await getActiveTab();
-      if (!tabUrl.includes('docs.google.com/document/')) {
+      if (!tabUrl.startsWith('https://docs.google.com/document/')) {
         setStatus('Not a Google Docs page.', 'error');
         return;
       }

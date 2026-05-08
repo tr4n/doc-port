@@ -6,7 +6,6 @@
   "author": "Quang Huy Tran <quanghuytran.hust@gmail.com>",
   "scripts": {
     "build": "npm run icons && webpack --mode production",
-    "build:zip": "npm run build && rm -f dist.zip && zip -r dist.zip dist",
     "dev": "npm run icons && webpack --mode development --watch",
     "icons": "node scripts/generate-icons.js",
     "clean": "rm -rf dist"
