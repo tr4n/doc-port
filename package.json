@@ -1,5 +1,5 @@
 {
-  "name": "docs-scanner",
+  "name": "doc-port",
   "version": "1.0.0",
   "private": true,
   "description": "Chrome Extension to extract view-only Google Docs to .docx",

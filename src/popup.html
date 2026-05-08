@@ -126,13 +126,16 @@
     }
     .preview-stats { font-size: 10.5px; color: #5f6368; margin-top: 2px; }
 
-    .btn-close-preview {
+    .btn-close-preview, .btn-icon-preview {
       background: none; border: none; cursor: pointer;
-      color: #9aa0a6; font-size: 18px; line-height: 1;
-      padding: 0 2px; flex-shrink: 0;
+      color: #9aa0a6; line-height: 1;
+      flex-shrink: 0;
       transition: color .15s;
+      display: flex; align-items: center; justify-content: center;
     }
-    .btn-close-preview:hover { color: #202124; }
+    .btn-close-preview { font-size: 18px; padding: 0 2px; }
+    .btn-icon-preview { padding: 2px; }
+    .btn-close-preview:hover, .btn-icon-preview:hover { color: #202124; }
 
     /* Scrollable content area */
     #previewContent {
@@ -306,7 +309,15 @@
           <div class="preview-doc-title" id="previewTitle"></div>
           <div class="preview-stats" id="previewStats"></div>
         </div>
-        <button class="btn-close-preview" id="closePreviewBtn" title="Close preview">×</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn-icon-preview" id="copyPreviewBtn" title="Copy content">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+          <button class="btn-close-preview" id="closePreviewBtn" title="Close preview">×</button>
+        </div>
       </div>
       <div id="previewContent"></div>
     </div>

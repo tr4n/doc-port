@@ -465,3 +465,23 @@ document.getElementById('openMobileBtn')!.addEventListener('click', async () => 
 document.getElementById('closePreviewBtn')!.addEventListener('click', () => {
   hidePreviewSection();
 });
+
+document.getElementById('copyPreviewBtn')!.addEventListener('click', () => {
+  const content = document.getElementById('previewContent');
+  if (!content) return;
+  
+  try {
+    const range = document.createRange();
+    range.selectNode(content);
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(range);
+      document.execCommand('copy');
+      selection.removeAllRanges();
+      setStatus('Copied to clipboard successfully!', 'success');
+    }
+  } catch (err) {
+    setStatus(`Copy failed: ${(err as Error).message}`, 'error');
+  }
+});

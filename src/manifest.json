@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "DocPort — Docs to Word Exporter",
   "short_name": "DocPort",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "quanghuytran.hust@gmail.com",
   "description": "Export Google Docs (including view-only) to .docx files. Preserves headings, styling, tables, images, and links.",
   "permissions": [
