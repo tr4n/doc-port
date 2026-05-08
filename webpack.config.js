@@ -36,6 +36,6 @@ module.exports = {
     hints: false,
   },
   optimization: {
-    minimize: true,
+    minimize: false,
   },
 };
