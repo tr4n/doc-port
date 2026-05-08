@@ -31,7 +31,6 @@ module.exports = {
       ],
     }),
   ],
-  // Tránh bundle quá lớn khi dùng docx
   performance: {
     hints: false,
   },
