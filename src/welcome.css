@@ -1,0 +1,235 @@
+/* Custom properties for theme colors */
+:root {
+  --primary: #1a73e8;
+  --primary-hover: #1557b0;
+  --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e8f0fe 100%);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --text-main: #202124;
+  --text-sub: #5f6368;
+  --border-color: #dadce0;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.welcome-container {
+  max-width: 1000px;
+  width: 100%;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  padding: 50px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header styling */
+.welcome-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.logo-area {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.logo-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.welcome-header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: var(--text-sub);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* Steps Grid */
+.welcome-steps-container {
+  width: 100%;
+  margin-bottom: 48px;
+}
+
+.welcome-steps-container h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.step-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 30px 24px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.step-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(26, 115, 232, 0.1);
+  border-color: rgba(26, 115, 232, 0.4);
+}
+
+.step-badge {
+  position: absolute;
+  top: -15px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(26, 115, 232, 0.3);
+}
+
+.step-image-wrapper {
+  width: 100%;
+  height: 180px;
+  margin: 15px 0 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f8f9fa;
+  border: 1px solid #f1f3f4;
+}
+
+.step-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.step-card:hover .step-img {
+  transform: scale(1.05);
+}
+
+.step-card h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.step-card p {
+  font-size: 13.5px;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+/* Call to Action */
+.cta-area {
+  margin-bottom: 30px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 15px rgba(26, 115, 232, 0.35);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 6px 20px rgba(26, 115, 232, 0.45);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 16px;
+  border-radius: 12px;
+}
+
+/* Footer */
+.welcome-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border-color);
+  width: 100%;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.welcome-footer p {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+/* Responsive adjustment */
+@media (max-width: 768px) {
+  body {
+    padding: 20px 10px;
+  }
+  .welcome-container {
+    padding: 30px 20px;
+  }
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .welcome-header h1 {
+    font-size: 28px;
+  }
+}
