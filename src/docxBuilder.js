@@ -11,7 +11,7 @@
  *  - Proper page margins and font defaults
  */
 
-import {
+const {
   Document,
   Paragraph,
   TextRun,
@@ -29,15 +29,7 @@ import {
   ShadingType,
   convertInchesToTwip,
   ImageRun,
-} from 'docx';
-
-import type {
-  ParsedDocument,
-  DocElement,
-  TextRun as MyTextRun,
-  DocTableRow,
-  DocImage,
-} from './extractor';
+} = window.docx;
 
 // ──────────────────────────────────────────────
 // Constants
@@ -46,8 +38,7 @@ import type {
 const BULLET_LIST_REF = 'docs-extractor-bullet';
 const NUMBERED_LIST_REF = 'docs-extractor-numbered';
 
-type HeadingLevelValue = (typeof HeadingLevel)[keyof typeof HeadingLevel];
-const HEADING_LEVEL_MAP: Record<number, HeadingLevelValue> = {
+const HEADING_LEVEL_MAP = {
   1: HeadingLevel.HEADING_1,
   2: HeadingLevel.HEADING_2,
   3: HeadingLevel.HEADING_3,
@@ -56,8 +47,7 @@ const HEADING_LEVEL_MAP: Record<number, HeadingLevelValue> = {
   6: HeadingLevel.HEADING_6,
 };
 
-type AlignmentValue = (typeof AlignmentType)[keyof typeof AlignmentType];
-const ALIGN_MAP: Record<string, AlignmentValue> = {
+const ALIGN_MAP = {
   left: AlignmentType.LEFT,
   center: AlignmentType.CENTER,
   right: AlignmentType.RIGHT,
@@ -76,7 +66,7 @@ const PX_TO_EMU = 914400 / 96; // 96 DPI assumed
 // ──────────────────────────────────────────────
 
 /** Detect image format from magic bytes */
-function detectImageType(buf: ArrayBuffer): 'jpg' | 'png' | 'gif' | 'bmp' | null {
+function detectImageType(buf) {
   const b = new Uint8Array(buf, 0, 4);
   if (b[0] === 0xff && b[1] === 0xd8) return 'jpg';
   if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return 'png';
@@ -85,7 +75,7 @@ function detectImageType(buf: ArrayBuffer): 'jpg' | 'png' | 'gif' | 'bmp' | null
   return null;
 }
 
-function base64ToArrayBuffer(b64: string): ArrayBuffer {
+function base64ToArrayBuffer(b64) {
   // Strip data URI prefix if present
   const raw = b64.includes(',') ? b64.split(',')[1] : b64;
   const binary = atob(raw);
@@ -95,15 +85,12 @@ function base64ToArrayBuffer(b64: string): ArrayBuffer {
   return buf;
 }
 
-function pxToEmu(px: number): number {
+function pxToEmu(px) {
   return Math.round(px * PX_TO_EMU);
 }
 
 /** Scale image dimensions so width ≤ MAX_IMAGE_EMU_WIDTH, preserving aspect ratio */
-function scaleImageDimensions(
-  wPx: number | undefined,
-  hPx: number | undefined,
-): { width: number; height: number } {
+function scaleImageDimensions(wPx, hPx) {
   const defaultW = 400;
   const defaultH = 300;
 
@@ -120,7 +107,7 @@ function scaleImageDimensions(
   return { width: Math.max(wEmu, 914400), height: Math.max(hEmu, 685800) };
 }
 
-function buildImageParagraph(img: DocImage): Paragraph | null {
+function buildImageParagraph(img) {
   if (!img.base64) return null;
 
   try {
@@ -148,8 +135,8 @@ function buildImageParagraph(img: DocImage): Paragraph | null {
 // Text run builder
 // ──────────────────────────────────────────────
 
-function buildTextRuns(runs: MyTextRun[]): (TextRun | ExternalHyperlink)[] {
-  const result: (TextRun | ExternalHyperlink)[] = [];
+function buildTextRuns(runs) {
+  const result = [];
   const merged = mergeRuns(runs);
 
   for (const run of merged) {
@@ -186,9 +173,9 @@ function buildTextRuns(runs: MyTextRun[]): (TextRun | ExternalHyperlink)[] {
   return result;
 }
 
-function mergeRuns(runs: MyTextRun[]): MyTextRun[] {
+function mergeRuns(runs) {
   if (runs.length === 0) return [];
-  const out: MyTextRun[] = [{ ...runs[0] }];
+  const out = [{ ...runs[0] }];
   for (let i = 1; i < runs.length; i++) {
     const prev = out[out.length - 1];
     const cur = runs[i];
@@ -259,7 +246,7 @@ function buildNumberingConfig() {
 // Table builder
 // ──────────────────────────────────────────────
 
-function buildTable(rows: DocTableRow[]): Table {
+function buildTable(rows) {
   const tableRows = rows.map(
     (row) =>
       new TableRow({
@@ -296,8 +283,8 @@ function buildTable(rows: DocTableRow[]): Table {
 // Main builder
 // ──────────────────────────────────────────────
 
-export async function buildDocx(parsed: ParsedDocument): Promise<Blob> {
-  const children: (Paragraph | Table)[] = [];
+export async function buildDocx(parsed) {
+  const children = [];
 
   for (const el of parsed.elements) {
     switch (el.type) {
@@ -341,7 +328,7 @@ export async function buildDocx(parsed: ParsedDocument): Promise<Blob> {
       }
 
       case 'image': {
-        const imgPara = buildImageParagraph(el as DocImage);
+        const imgPara = buildImageParagraph(el);
         if (imgPara) {
           children.push(imgPara);
         }

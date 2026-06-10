@@ -8,94 +8,22 @@
  *     and CSS properties (font-weight, font-style, text-decoration) to our types.
  */
 
-export interface TextRun {
-  text: string;
-  bold?: boolean;
-  italic?: boolean;
-  underline?: boolean;
-  strikethrough?: boolean;
-  link?: string;
-  color?: string;
-}
-
-export interface DocHeading {
-  type: 'heading';
-  level: 1 | 2 | 3 | 4 | 5 | 6;
-  runs: TextRun[];
-}
-
-export interface DocParagraph {
-  type: 'paragraph';
-  runs: TextRun[];
-  alignment?: 'left' | 'center' | 'right' | 'justify';
-}
-
-export interface DocListItem {
-  type: 'listItem';
-  listStyle: 'bullet' | 'numbered';
-  level: number;
-  runs: TextRun[];
-}
-
-export interface DocTableCell {
-  /** Each entry is one paragraph inside the cell */
-  paragraphs: TextRun[][];
-}
-
-export interface DocTableRow {
-  cells: DocTableCell[];
-  isHeader: boolean;
-}
-
-export interface DocTable {
-  type: 'table';
-  rows: DocTableRow[];
-}
-
-export interface DocImage {
-  type: 'image';
-  src: string;
-  alt?: string;
-  naturalWidth?: number;
-  naturalHeight?: number;
-  /** Populated in popup.ts after fetching from tab context */
-  base64?: string;
-  imageType?: 'jpg' | 'png' | 'gif' | 'bmp';
-}
-
-export type DocElement = DocHeading | DocParagraph | DocListItem | DocTable | DocImage;
-
-export interface ParsedDocument {
-  title: string;
-  elements: DocElement[];
-}
-
 // ──────────────────────────────────────────────
 // CSS class parser
 // ──────────────────────────────────────────────
 
-interface CSSProps {
-  bold?: boolean;
-  italic?: boolean;
-  underline?: boolean;
-  strikethrough?: boolean;
-  color?: string;
-  fontSize?: number;
-  textAlign?: 'left' | 'center' | 'right' | 'justify';
-}
-
-function parseStyleSheets(doc: Document): Map<string, CSSProps> {
-  const map = new Map<string, CSSProps>();
+function parseStyleSheets(doc) {
+  const map = new Map();
 
   doc.querySelectorAll('style').forEach((styleEl) => {
     const css = styleEl.textContent ?? '';
     const ruleRegex = /\.([\w-]+)\s*\{([^}]+)\}/g;
-    let m: RegExpExecArray | null;
+    let m;
 
     while ((m = ruleRegex.exec(css)) !== null) {
       const cls = m[1];
       const body = m[2];
-      const props: CSSProps = {};
+      const props = {};
 
       if (/font-weight\s*:\s*(bold|[6-9]\d{2})/.test(body)) props.bold = true;
       if (/font-style\s*:\s*italic/.test(body)) props.italic = true;
@@ -109,7 +37,7 @@ function parseStyleSheets(doc: Document): Map<string, CSSProps> {
       if (colorMatch) props.color = colorMatch[1];
 
       const alignMatch = body.match(/text-align\s*:\s*(left|center|right|justify)/);
-      if (alignMatch) props.textAlign = alignMatch[1] as CSSProps['textAlign'];
+      if (alignMatch) props.textAlign = alignMatch[1];
 
       if (Object.keys(props).length > 0) map.set(cls, props);
     }
@@ -118,8 +46,8 @@ function parseStyleSheets(doc: Document): Map<string, CSSProps> {
   return map;
 }
 
-function mergePropsFromElement(el: Element, cssMap: Map<string, CSSProps>): CSSProps {
-  let merged: CSSProps = {};
+function mergePropsFromElement(el, cssMap) {
+  let merged = {};
 
   el.classList.forEach((cls) => {
     const p = cssMap.get(cls);
@@ -136,7 +64,7 @@ function mergePropsFromElement(el: Element, cssMap: Map<string, CSSProps>): CSSP
   if (fsMatch) merged.fontSize = parseFloat(fsMatch[1]);
 
   const alignMatch = style.match(/text-align\s*:\s*(left|center|right|justify)/);
-  if (alignMatch) merged.textAlign = alignMatch[1] as CSSProps['textAlign'];
+  if (alignMatch) merged.textAlign = alignMatch[1];
 
   return merged;
 }
@@ -145,18 +73,14 @@ function mergePropsFromElement(el: Element, cssMap: Map<string, CSSProps>): CSSP
 // Inline run extractor (walks text + formatting nodes)
 // ──────────────────────────────────────────────
 
-function extractRuns(
-  node: Node,
-  cssMap: Map<string, CSSProps>,
-  inherited: CSSProps = {},
-): TextRun[] {
-  const runs: TextRun[] = [];
+function extractRuns(node, cssMap, inherited = {}) {
+  const runs = [];
 
-  function walk(n: Node, fmt: CSSProps, inheritedLink?: string): void {
+  function walk(n, fmt, inheritedLink) {
     if (n.nodeType === Node.TEXT_NODE) {
       const text = n.textContent ?? '';
       if (!text) return;
-      const run: TextRun = { text };
+      const run = { text };
       if (fmt.bold) run.bold = true;
       if (fmt.italic) run.italic = true;
       if (fmt.underline) run.underline = true;
@@ -169,13 +93,13 @@ function extractRuns(
 
     if (n.nodeType !== Node.ELEMENT_NODE) return;
 
-    const el = n as Element;
+    const el = n;
     const tag = el.tagName.toLowerCase();
 
     if (tag === 'br') { runs.push({ text: '\n' }); return; }
     if (['script', 'style', 'noscript', 'img', 'table'].includes(tag)) return;
 
-    let newFmt: CSSProps = { ...fmt, ...mergePropsFromElement(el, cssMap) };
+    let newFmt = { ...fmt, ...mergePropsFromElement(el, cssMap) };
 
     if (tag === 'b' || tag === 'strong') newFmt.bold = true;
     if (tag === 'i' || tag === 'em') newFmt.italic = true;
@@ -201,7 +125,7 @@ function extractRuns(
   return runs;
 }
 
-function hasVisibleText(runs: TextRun[]): boolean {
+function hasVisibleText(runs) {
   return runs.some((r) => r.text.trim().length > 0);
 }
 
@@ -211,15 +135,12 @@ function hasVisibleText(runs: TextRun[]): boolean {
 
 const HEADING_TAGS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
 
-function tagToHeadingLevel(tag: string): 1 | 2 | 3 | 4 | 5 | 6 | null {
-  if (HEADING_TAGS.has(tag)) return parseInt(tag[1]) as 1 | 2 | 3 | 4 | 5 | 6;
+function tagToHeadingLevel(tag) {
+  if (HEADING_TAGS.has(tag)) return parseInt(tag[1]);
   return null;
 }
 
-function inferHeadingLevel(
-  el: Element,
-  cssMap: Map<string, CSSProps>,
-): 1 | 2 | 3 | 4 | 5 | 6 | null {
+function inferHeadingLevel(el, cssMap) {
   const props = mergePropsFromElement(el, cssMap);
   const size = props.fontSize ?? 0;
   if (size >= 22) return 1;
@@ -233,8 +154,8 @@ function inferHeadingLevel(
 // Handles multi-paragraph cells properly
 // ──────────────────────────────────────────────
 
-function extractCellParagraphs(cell: Element, cssMap: Map<string, CSSProps>): TextRun[][] {
-  const paragraphs: TextRun[][] = [];
+function extractCellParagraphs(cell, cssMap) {
+  const paragraphs = [];
 
   // Find direct block-level children that carry content
   const blockTags = new Set(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'ul', 'ol']);
@@ -262,7 +183,7 @@ function extractCellParagraphs(cell: Element, cssMap: Map<string, CSSProps>): Te
 // Main parser
 // ──────────────────────────────────────────────
 
-export function parseDocument(html: string): ParsedDocument {
+export function parseDocument(html) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
@@ -271,9 +192,9 @@ export function parseDocument(html: string): ParsedDocument {
   const rawTitle = doc.title ?? '';
   const title = rawTitle.replace(/\s*[-–]\s*Google Docs\s*$/i, '').trim() || 'document';
 
-  const elements: DocElement[] = [];
+  const elements = [];
 
-  function pushParagraphOrHeading(el: Element): void {
+  function pushParagraphOrHeading(el) {
     const tag = el.tagName.toLowerCase();
     const runs = extractRuns(el, cssMap);
     if (!hasVisibleText(runs)) return;
@@ -294,15 +215,11 @@ export function parseDocument(html: string): ParsedDocument {
     elements.push({ type: 'paragraph', runs, alignment });
   }
 
-  function processListElement(
-    list: Element,
-    style: 'bullet' | 'numbered',
-    level: number,
-  ): void {
+  function processListElement(list, style, level) {
     for (const child of Array.from(list.children)) {
       if (child.tagName.toLowerCase() !== 'li') continue;
 
-      const liClone = child.cloneNode(true) as Element;
+      const liClone = child.cloneNode(true);
       liClone.querySelectorAll('ul, ol').forEach((n) => n.remove());
 
       const runs = extractRuns(liClone, cssMap);
@@ -318,8 +235,8 @@ export function parseDocument(html: string): ParsedDocument {
     }
   }
 
-  function processTable(table: Element): void {
-    const rows: DocTableRow[] = [];
+  function processTable(table) {
+    const rows = [];
 
     // Use direct row ownership check to avoid picking up nested-table rows
     const allRows = Array.from(table.querySelectorAll('tr')).filter(
@@ -336,7 +253,7 @@ export function parseDocument(html: string): ParsedDocument {
         (cell) => cell.closest('tr') === tr,
       );
 
-      const cells: DocTableCell[] = allCells.map((cell) => ({
+      const cells = allCells.map((cell) => ({
         paragraphs: extractCellParagraphs(cell, cssMap),
       }));
 
@@ -346,7 +263,7 @@ export function parseDocument(html: string): ParsedDocument {
     if (rows.length > 0) elements.push({ type: 'table', rows });
   }
 
-  function processContainer(container: Element): void {
+  function processContainer(container) {
     for (const child of Array.from(container.children)) {
       const tag = child.tagName.toLowerCase();
 
